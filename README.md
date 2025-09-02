@@ -1,5 +1,15 @@
 # VSCode-RSS
 
+## Patched by Mopip77
+
+## Enhanced Features
+
+### Hide Images Option
+
+This fork adds a configuration option that allows users to choose whether to display images in the RSS reader.
+
+---
+
 An RSS reader embedded in Visual Studio Code
 
 [![version](https://vsmarketplacebadge.apphb.com/version-short/luyuhuang.rss.svg)](https://marketplace.visualstudio.com/items?itemName=luyuhuang.rss)

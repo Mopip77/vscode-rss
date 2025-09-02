@@ -1,5 +1,15 @@
 # VSCode-RSS
 
+## 由 Mopip77 修补
+
+## 增强功能
+
+### 隐藏图片选项
+
+此分支添加了一个配置选项，允许用户选择是否在 RSS 阅读器中显示图片。
+
+---
+
 嵌入在 Visual Studio Code 中的 RSS 阅读器
 
 [![version](https://vsmarketplacebadge.apphb.com/version-short/luyuhuang.rss.svg)](https://marketplace.visualstudio.com/items?itemName=luyuhuang.rss)
