@@ -230,8 +230,33 @@ export class App {
         this.refreshLists(App.ARTICLE);
     }
 
+    private processImagesForButtonMode(content: string): string {
+        return content.replace(/<img([^>]*)>/gi, (match, attributes) => {
+            const altMatch = attributes.match(/alt\s*=\s*["']([^"']*)["']/i);
+            const altText = altMatch ? altMatch[1] : '';
+            const buttonText = altText ? `${altText}(点击展示图片)` : '(点击展示图片)';
+            
+            return `<button class="image-placeholder-btn" data-original-img="${match.replace(/"/g, '&quot;')}" style="
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                font-size: 14px;
+                color: #666;
+                margin: 4px 0;
+                display: inline-block;
+            " onmouseover="this.style.backgroundColor='#e0e0e0'" onmouseout="this.style.backgroundColor='#f0f0f0'">${buttonText}</button>`;
+        });
+    }
+
     private getHTML(content: string, panel: vscode.WebviewPanel) {
         const css = '<style type="text/css">body{font-size:1em;max-width:960px;margin:auto;}</style>';
+
+        const showImages = App.cfg.get<boolean>('show-images');
+        if (!showImages) {
+            content = this.processImagesForButtonMode(content);
+        }
 
         const star_path = vscode.Uri.file(pathJoin(this.context.extensionPath, 'resources/star.svg'));
         const star_src = panel.webview.asWebviewUri(star_path);
@@ -270,6 +295,18 @@ export class App {
         function web() {
             vscode.postMessage('web')
         }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('click', function(event) {
+                if (event.target.classList.contains('image-placeholder-btn')) {
+                    const button = event.target;
+                    const originalImg = button.getAttribute('data-original-img');
+                    if (originalImg) {
+                        button.outerHTML = originalImg;
+                    }
+                }
+            });
+        });
         </script>
         <img src="${web_src}" title="Open link" onclick="web()" class="float-btn" style="bottom:1rem;"/>
         <img src="${star_src}" title="Add to favorites" onclick="star()" class="float-btn" style="bottom:4rem;"/>
