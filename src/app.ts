@@ -322,7 +322,7 @@ export class App {
     async rss_read(abstract: Abstract) {
         const content = await this.currCollection().getContent(abstract.id);
         const panel = vscode.window.createWebviewPanel(
-            'rss', abstract.title, vscode.ViewColumn.One,
+            'rss', abstract.title, vscode.ViewColumn.Active,
             {retainContextWhenHidden: true, enableScripts: true});
 
         abstract.read = true;
