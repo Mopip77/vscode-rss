@@ -93,7 +93,7 @@
         "rss.show-images": {
           "type": "boolean",
           "default": true,
-          "description": "Whether to show images in articles directly or as clickable buttons"
+          "description": "Whether to show images and videos in articles directly or as clickable buttons"
         }
       }
     },

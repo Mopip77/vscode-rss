@@ -230,12 +230,27 @@ export class App {
         this.refreshLists(App.ARTICLE);
     }
 
-    private processImagesForButtonMode(content: string): string {
-        return content.replace(/<img([^>]*)>/gi, (match, attributes) => {
+    private processMediaForButtonMode(content: string): string {
+        content = content.replace(/<img([^>]*)>/gi, (match, attributes) => {
             const altMatch = attributes.match(/alt\s*=\s*["']([^"']*)["']/i);
             const altText = altMatch ? altMatch[1] : '';
             const buttonText = altText ? `${altText}(点击展示图片)` : '(点击展示图片)';
             
+            return `<button class="image-placeholder-btn" data-original-img="${match.replace(/"/g, '&quot;')}" style="
+                background-color: #f0f0f0;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                padding: 8px 12px;
+                cursor: pointer;
+                font-size: 14px;
+                color: #666;
+                margin: 4px 0;
+                display: inline-block;
+            " onmouseover="this.style.backgroundColor='#e0e0e0'" onmouseout="this.style.backgroundColor='#f0f0f0'">${buttonText}</button>`;
+        });
+
+        return content.replace(/<(video|iframe)([^>]*)>([\s\S]*?)<\/\1>/gi, (match, tagName) => {
+            const buttonText = '(点击展示视频)';
             return `<button class="image-placeholder-btn" data-original-img="${match.replace(/"/g, '&quot;')}" style="
                 background-color: #f0f0f0;
                 border: 1px solid #ccc;
@@ -255,7 +270,7 @@ export class App {
 
         const showImages = App.cfg.get<boolean>('show-images');
         if (!showImages) {
-            content = this.processImagesForButtonMode(content);
+            content = this.processMediaForButtonMode(content);
         }
 
         const star_path = vscode.Uri.file(pathJoin(this.context.extensionPath, 'resources/star.svg'));
