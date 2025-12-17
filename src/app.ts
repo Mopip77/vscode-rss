@@ -298,6 +298,13 @@ export class App {
             filter: drop-shadow(0 0 0.2rem rgba(0,0,0,.5))
                     brightness(80%);
         }
+        /* 自适应图片：如果图片小于容器就原尺寸显示，否则等比缩小适应容器 */
+        img.responsive-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            margin: 4px 0;
+        }
         </style>
         <script type="text/javascript">
         const vscode = acquireVsCodeApi();
@@ -317,7 +324,20 @@ export class App {
                     const button = event.target;
                     const originalImg = button.getAttribute('data-original-img');
                     if (originalImg) {
-                        button.outerHTML = originalImg;
+                        // 创建临时元素来解析原始 HTML
+                        const temp = document.createElement('div');
+                        temp.innerHTML = originalImg;
+                        const imgElement = temp.querySelector('img, video, iframe');
+                        if (imgElement) {
+                            // 给图片添加自适应样式类
+                            if (imgElement.tagName === 'IMG') {
+                                imgElement.classList.add('responsive-image');
+                            }
+                            button.outerHTML = imgElement.outerHTML;
+                        } else {
+                            // 如果不是 img/video/iframe，直接替换
+                            button.outerHTML = originalImg;
+                        }
                     }
                 }
             });
