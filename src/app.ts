@@ -366,7 +366,14 @@ export class App {
         panel.webview.onDidReceiveMessage(async (e) => {
             if (e === 'web') {
                 if (abstract.link) {
-                    vscode.env.openExternal(vscode.Uri.parse(abstract.link));
+                    const openInBrowser = App.cfg.get<boolean>('open-in-browser');
+                    if (openInBrowser) {
+                        // Open in external browser
+                        vscode.env.openExternal(vscode.Uri.parse(abstract.link));
+                    } else {
+                        // Open in VSCode simple browser (new tab)
+                        vscode.commands.executeCommand('simpleBrowser.show', abstract.link);
+                    }
                 }
             } else if (e === 'star') {
                 await this.currCollection().addToFavorites(abstract.id);

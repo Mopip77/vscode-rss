@@ -4,7 +4,7 @@
   "description": "An RSS reader embedded in Visual Studio Code",
   "license": "MIT",
   "icon": "logo.png",
-  "version": "0.10.8",
+  "version": "0.10.9",
   "publisher": "Mopip77",
   "author": "Mopip77",
   "homepage": "https://github.com/Mopip77/vscode-rss.git",
@@ -94,6 +94,11 @@
           "type": "boolean",
           "default": true,
           "description": "Whether to show images and videos in articles directly or as clickable buttons"
+        },
+        "rss.open-in-browser": {
+          "type": "boolean",
+          "default": false,
+          "description": "When clicking the web button: open link in external browser (true) or VSCode internal browser tab (false)"
         }
       }
     },
