@@ -266,7 +266,15 @@ export class App {
     }
 
     private getHTML(content: string, panel: vscode.WebviewPanel) {
-        const css = '<style type="text/css">body{font-size:1em;max-width:960px;margin:auto;}</style>';
+        const fontFamily = App.cfg.get<string>('article-font-family') || '';
+        const fontSize = App.cfg.get<string>('article-font-size') || '1em';
+
+        let bodyStyle = `font-size:${fontSize};max-width:960px;margin:auto;`;
+        if (fontFamily) {
+            bodyStyle += `font-family:${fontFamily};`;
+        }
+
+        const css = `<style type="text/css">body{${bodyStyle}}</style>`;
 
         const showImages = App.cfg.get<boolean>('show-images');
         if (!showImages) {
