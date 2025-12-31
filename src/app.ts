@@ -287,6 +287,8 @@ export class App {
         const web_path = vscode.Uri.file(pathJoin(this.context.extensionPath, 'resources/web.svg'));
         const web_src = panel.webview.asWebviewUri(web_path);
 
+        let icon_offset = -2;
+
         let html = css + content + `
         <style>
         .float-btn {
@@ -316,6 +318,8 @@ export class App {
         </style>
         <script type="text/javascript">
         const vscode = acquireVsCodeApi();
+        let fontSizeOffset = 0; // 记录字体大小的偏移量（px）
+        
         function star() {
             vscode.postMessage('star')
         }
@@ -324,6 +328,14 @@ export class App {
         }
         function web() {
             vscode.postMessage('web')
+        }
+        function increaseFontSize() {
+            fontSizeOffset += 2;
+            document.body.style.fontSize = 'calc(${fontSize} + ' + fontSizeOffset + 'px)';
+        }
+        function decreaseFontSize() {
+            fontSizeOffset -= 2;
+            document.body.style.fontSize = 'calc(${fontSize} + ' + fontSizeOffset + 'px)';
         }
         
         document.addEventListener('DOMContentLoaded', function() {
@@ -351,14 +363,16 @@ export class App {
             });
         });
         </script>
-        <img src="${web_src}" title="Open link" onclick="web()" class="float-btn" style="bottom:1rem;"/>
-        <img src="${star_src}" title="Add to favorites" onclick="star()" class="float-btn" style="bottom:4rem;"/>
+        <img src="${web_src}" title="Open link" onclick="web()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>
+        <img src="${star_src}" title="Add to favorites" onclick="star()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>
         `;
         if (this.currCollection().getArticles('<unread>').length > 0) {
             const next_path = vscode.Uri.file(pathJoin(this.context.extensionPath, 'resources/next.svg'));
             const next_src = panel.webview.asWebviewUri(next_path);
-            html += `<img src="${next_src}" title="Next" onclick="next()" class="float-btn" style="bottom:7rem;"/>`;
+            html += `<img src="${next_src}" title="Next" onclick="next()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>`;
         }
+        html += `<button onclick="decreaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="缩小字体">A-</button>`
+        html += `<button onclick="increaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="放大字体">A+</button>`;
         return html;
     }
 
