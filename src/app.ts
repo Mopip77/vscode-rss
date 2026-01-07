@@ -27,6 +27,8 @@ export class App {
     private article_list = new ArticleList();
     private favorites_list = new FavoritesList();
 
+    private article_tree_view?: vscode.TreeView<Article>;
+
     private status_bar = new StatusBar();
 
     public collections: {[key: string]: Collection} = {};
@@ -179,7 +181,9 @@ export class App {
     initViews() {
         vscode.window.registerTreeDataProvider('rss-accounts', this.account_list);
         vscode.window.registerTreeDataProvider('rss-feeds', this.feed_list);
-        vscode.window.registerTreeDataProvider('rss-articles', this.article_list);
+        this.article_tree_view = vscode.window.createTreeView('rss-articles', {
+            treeDataProvider: this.article_list
+        });
         vscode.window.registerTreeDataProvider('rss-favorites', this.favorites_list);
         this.status_bar.init();
     }
@@ -222,11 +226,32 @@ export class App {
     rss_select(account: string) {
         this.current_account = account;
         this.current_feed = undefined;
+        
+        // Reset article view title
+        if (this.article_tree_view) {
+            this.article_tree_view.title = 'Articles';
+        }
+        
         this.refreshLists(App.FEED | App.ARTICLE | App.FAVORITES);
     }
 
     rss_articles(feed: string) {
         this.current_feed = feed;
+        
+        // Update article view title
+        if (this.article_tree_view) {
+            let title = 'Articles';
+            if (feed === '<unread>') {
+                title = 'Articles (Unread)';
+            } else {
+                const summary = this.currCollection().getSummary(feed);
+                if (summary) {
+                    title = `Articles (${summary.title})`;
+                }
+            }
+            this.article_tree_view.title = title;
+        }
+        
         this.refreshLists(App.ARTICLE);
     }
 
