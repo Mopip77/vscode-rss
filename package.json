@@ -4,7 +4,7 @@
   "description": "An RSS reader embedded in Visual Studio Code",
   "license": "MIT",
   "icon": "logo.png",
-  "version": "0.10.13",
+  "version": "0.10.14",
   "publisher": "Mopip77",
   "author": "Mopip77",
   "homepage": "https://github.com/Mopip77/vscode-rss.git",
@@ -249,7 +249,8 @@
         },
         {
           "id": "rss-favorites",
-          "name": "Favorites"
+          "name": "Favorites",
+          "visibility": "collapsed"
         }
       ]
     },
