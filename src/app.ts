@@ -14,6 +14,7 @@ import { StatusBar } from './status_bar';
 import { InoreaderCollection } from './inoreader_collection';
 import { assert } from 'console';
 import { parseOPML } from './parser';
+import { AIBriefPanel } from './ai_brief_panel';
 
 export class App {
     private static _instance?: App;
@@ -26,6 +27,7 @@ export class App {
     private feed_list = new FeedList();
     private article_list = new ArticleList();
     private favorites_list = new FavoritesList();
+    private ai_brief_panel: AIBriefPanel;
 
     private article_tree_view?: vscode.TreeView<Article>;
 
@@ -36,7 +38,9 @@ export class App {
     private constructor(
         public readonly context: vscode.ExtensionContext,
         public readonly root: string,
-    ) {}
+    ) {
+        this.ai_brief_panel = new AIBriefPanel(context);
+    }
 
     private async initAccounts() {
         let keys = Object.keys(App.cfg.accounts);
@@ -214,6 +218,7 @@ export class App {
             ['rss.import-from-opml', this.rss_import_from_opml],
             ['rss.clean-old-articles', this.rss_clean_old_articles],
             ['rss.clean-all-old-articles', this.rss_clean_all_old_articles],
+            ['rss.set-ai-api-key', this.rss_set_ai_api_key],
         ];
 
         for (const [cmd, handler] of commands) {
@@ -306,6 +311,9 @@ export class App {
             content = this.processMediaForButtonMode(content);
         }
 
+        // Inject AI brief panel if feature is enabled
+        const aiPanelHTML = this.ai_brief_panel.getHTML();
+
         const star_path = vscode.Uri.file(pathJoin(this.context.extensionPath, 'resources/star.svg'));
         const star_src = panel.webview.asWebviewUri(star_path);
 
@@ -314,7 +322,7 @@ export class App {
 
         let icon_offset = -2;
 
-        let html = css + content + `
+        let html = css + aiPanelHTML + content + `
         <style>
         .float-btn {
             width: 2.2rem;
@@ -340,6 +348,7 @@ export class App {
             display: block;
             margin: 4px 0;
         }
+        ${this.ai_brief_panel.getStyles()}
         </style>
         <script type="text/javascript">
         const vscode = acquireVsCodeApi();
@@ -362,7 +371,9 @@ export class App {
             fontSizeOffset -= 2;
             document.body.style.fontSize = 'calc(${fontSize} + ' + fontSizeOffset + 'px)';
         }
-        
+
+        ${this.ai_brief_panel.getScript()}
+
         document.addEventListener('DOMContentLoaded', function() {
             document.addEventListener('click', function(event) {
                 if (event.target.classList.contains('image-placeholder-btn')) {
@@ -396,7 +407,7 @@ export class App {
             const next_src = panel.webview.asWebviewUri(next_path);
             html += `<img src="${next_src}" title="Next" onclick="next()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>`;
         }
-        html += `<button onclick="decreaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="缩小字体">A-</button>`
+        html += `<button onclick="decreaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="缩小字体">A-</button>`;
         html += `<button onclick="increaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="放大字体">A+</button>`;
         return html;
     }
@@ -411,6 +422,19 @@ export class App {
         panel.title = abstract.title;
         panel.webview.html = this.getHTML(content, panel);
         panel.webview.onDidReceiveMessage(async (e) => {
+            // Delegate AI brief messages to AIBriefPanel
+            const handled = await this.ai_brief_panel.handleMessage(
+                e,
+                panel,
+                abstract,
+                () => this.currCollection().getContent(abstract.id)
+            );
+
+            if (handled) {
+                return;
+            }
+
+            // Handle other messages
             if (e === 'web') {
                 if (abstract.link) {
                     const openInBrowser = App.cfg.get<boolean>('open-in-browser');
@@ -783,5 +807,10 @@ export class App {
 
         });
         this.context.subscriptions.push(disposable);
+    }
+
+    async rss_set_ai_api_key() {
+        const configManager = this.ai_brief_panel['configManager'] as import('./ai_config').AIConfigManager;
+        await configManager.promptForApiKey();
     }
 }

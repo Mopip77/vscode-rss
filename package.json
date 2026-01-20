@@ -4,7 +4,7 @@
   "description": "An RSS reader embedded in Visual Studio Code",
   "license": "MIT",
   "icon": "logo.png",
-  "version": "0.10.14",
+  "version": "0.10.15-d",
   "publisher": "Mopip77",
   "author": "Mopip77",
   "homepage": "https://github.com/Mopip77/vscode-rss.git",
@@ -109,6 +109,21 @@
           "type": "string",
           "default": "1em",
           "description": "Custom font size for article content (e.g., '16px', '1.2em', '14pt'). Default is '1em'."
+        },
+        "rss.ai-brief-enabled": {
+          "type": "boolean",
+          "default": false,
+          "description": "Enable AI brief generation for articles"
+        },
+        "rss.ai-brief-endpoint": {
+          "type": "string",
+          "default": "",
+          "description": "AI service endpoint URL (e.g., 'https://api.openai.com/v1/chat/completions' or 'https://generativelanguage.googleapis.com/v1beta/models/{model}:streamGenerateContent')"
+        },
+        "rss.ai-brief-model": {
+          "type": "string",
+          "default": "",
+          "description": "Model name (e.g., 'gpt-4o-mini', 'gemini-2.0-flash-exp', 'claude-3-5-sonnet-20241022')"
         }
       }
     },
@@ -222,6 +237,10 @@
       {
         "command": "rss.clean-all-old-articles",
         "title": "Clean old articles"
+      },
+      {
+        "command": "rss.set-ai-api-key",
+        "title": "RSS: Set AI API Key"
       }
     ],
     "viewsContainers": {
@@ -518,6 +537,8 @@
     "got": "^11.8.6",
     "he": "^1.2.0",
     "iconv-lite": "^0.5.1",
+    "marked": "^17.0.1",
+    "remend": "^1.1.0",
     "uuid": "^8.0.0"
   }
 }
