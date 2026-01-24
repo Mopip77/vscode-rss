@@ -33,7 +33,7 @@ export class App {
 
     private status_bar = new StatusBar();
 
-    public collections: {[key: string]: Collection} = {};
+    public collections: { [key: string]: Collection } = {};
 
     private constructor(
         public readonly context: vscode.ExtensionContext,
@@ -121,7 +121,7 @@ export class App {
         await collection.clean();
         delete this.collections[key];
 
-        const accounts = {...App.cfg.get<any>('accounts')};
+        const accounts = { ...App.cfg.get<any>('accounts') };
         delete accounts[key];
         await App.cfg.update('accounts', accounts, true);
     }
@@ -149,7 +149,7 @@ export class App {
     public static readonly FAVORITES = 1 << 3;
     public static readonly STATUS_BAR = 1 << 4;
 
-    refreshLists(list: number=0b11111) {
+    refreshLists(list: number = 0b11111) {
         if (list & App.ACCOUNT) {
             this.account_list.refresh();
         }
@@ -231,18 +231,18 @@ export class App {
     rss_select(account: string) {
         this.current_account = account;
         this.current_feed = undefined;
-        
+
         // Reset article view title
         if (this.article_tree_view) {
             this.article_tree_view.title = 'Articles';
         }
-        
+
         this.refreshLists(App.FEED | App.ARTICLE | App.FAVORITES);
     }
 
     rss_articles(feed: string) {
         this.current_feed = feed;
-        
+
         // Update article view title
         if (this.article_tree_view) {
             let title = 'Articles';
@@ -256,7 +256,7 @@ export class App {
             }
             this.article_tree_view.title = title;
         }
-        
+
         this.refreshLists(App.ARTICLE);
     }
 
@@ -265,7 +265,7 @@ export class App {
             const altMatch = attributes.match(/alt\s*=\s*["']([^"']*)["']/i);
             const altText = altMatch ? altMatch[1] : '';
             const buttonText = altText ? `${altText}(点击展示图片)` : '(点击展示图片)';
-            
+
             return `<button class="image-placeholder-btn" data-original-img="${match.replace(/"/g, '&quot;')}" style="
                 background-color: #f0f0f0;
                 border: 1px solid #ccc;
@@ -342,7 +342,7 @@ export class App {
                     brightness(80%);
         }
         /* 自适应图片：如果图片小于容器就原尺寸显示，否则等比缩小适应容器 */
-        img.responsive-image {
+        img {
             max-width: 100%;
             height: auto;
             display: block;
@@ -353,7 +353,7 @@ export class App {
         <script type="text/javascript">
         const vscode = acquireVsCodeApi();
         let fontSizeOffset = 0; // 记录字体大小的偏移量（px）
-        
+
         function star() {
             vscode.postMessage('star')
         }
@@ -399,16 +399,16 @@ export class App {
             });
         });
         </script>
-        <img src="${web_src}" title="Open link" onclick="web()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>
-        <img src="${star_src}" title="Add to favorites" onclick="star()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>
+        <img src="${web_src}" title="Open link" onclick="web()" class="float-btn" style="bottom:${icon_offset += 3}rem;"/>
+        <img src="${star_src}" title="Add to favorites" onclick="star()" class="float-btn" style="bottom:${icon_offset += 3}rem;"/>
         `;
         if (this.currCollection().getArticles('<unread>').length > 0) {
             const next_path = vscode.Uri.file(pathJoin(this.context.extensionPath, 'resources/next.svg'));
             const next_src = panel.webview.asWebviewUri(next_path);
-            html += `<img src="${next_src}" title="Next" onclick="next()" class="float-btn" style="bottom:${icon_offset+=3}rem;"/>`;
+            html += `<img src="${next_src}" title="Next" onclick="next()" class="float-btn" style="bottom:${icon_offset += 3}rem;"/>`;
         }
-        html += `<button onclick="decreaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="缩小字体">A-</button>`;
-        html += `<button onclick="increaseFontSize()" class="float-btn" style="bottom:${icon_offset+=3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="放大字体">A+</button>`;
+        html += `<button onclick="decreaseFontSize()" class="float-btn" style="bottom:${icon_offset += 3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="缩小字体">A-</button>`;
+        html += `<button onclick="increaseFontSize()" class="float-btn" style="bottom:${icon_offset += 3}rem;background-color:rgba(255,255,255,0.9);border:none;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:bold;color:#333;" title="放大字体">A+</button>`;
         return html;
     }
 
@@ -416,7 +416,7 @@ export class App {
         const content = await this.currCollection().getContent(abstract.id);
         const panel = vscode.window.createWebviewPanel(
             'rss', abstract.title, vscode.ViewColumn.Active,
-            {retainContextWhenHidden: true, enableScripts: true});
+            { retainContextWhenHidden: true, enableScripts: true });
 
         abstract.read = true;
         panel.title = abstract.title;
@@ -513,7 +513,7 @@ export class App {
         }
         this.updating = true;
         await vscode.window.withProgress({
-            location: auto ? vscode.ProgressLocation.Window: vscode.ProgressLocation.Notification,
+            location: auto ? vscode.ProgressLocation.Window : vscode.ProgressLocation.Notification,
             title: "Updating RSS...",
             cancellable: false
         }, async () => {
@@ -572,8 +572,8 @@ export class App {
     }
 
     async rss_add_feed() {
-        const feed = await vscode.window.showInputBox({prompt: 'Enter the feed URL'});
-        if (feed === undefined || feed.length <= 0) {return;}
+        const feed = await vscode.window.showInputBox({ prompt: 'Enter the feed URL' });
+        if (feed === undefined || feed.length <= 0) { return; }
         await this.currCollection().addFeed(feed);
     }
 
@@ -594,33 +594,33 @@ export class App {
     async rss_new_account() {
         const type = await vscode.window.showQuickPick(
             ['local', 'ttrss', 'inoreader'],
-            {placeHolder: "Select account type"}
+            { placeHolder: "Select account type" }
         );
-        if (type === undefined) {return;}
-        const name = await vscode.window.showInputBox({prompt: 'Enter account name', value: type});
-        if (name === undefined || name.length <= 0) {return;}
+        if (type === undefined) { return; }
+        const name = await vscode.window.showInputBox({ prompt: 'Enter account name', value: type });
+        if (name === undefined || name.length <= 0) { return; }
 
         if (type === 'local') {
             await this.createLocalAccount(name);
         } else if (type === 'ttrss') {
-            const url = await vscode.window.showInputBox({prompt: 'Enter server URL(SELF_URL_PATH)'});
-            if (url === undefined || url.length <= 0) {return;}
-            const username = await vscode.window.showInputBox({prompt: 'Enter user name'});
-            if (username === undefined || username.length <= 0) {return;}
-            const password = await vscode.window.showInputBox({prompt: 'Enter password', password: true});
-            if (password === undefined || password.length <= 0) {return;}
+            const url = await vscode.window.showInputBox({ prompt: 'Enter server URL(SELF_URL_PATH)' });
+            if (url === undefined || url.length <= 0) { return; }
+            const username = await vscode.window.showInputBox({ prompt: 'Enter user name' });
+            if (username === undefined || username.length <= 0) { return; }
+            const password = await vscode.window.showInputBox({ prompt: 'Enter password', password: true });
+            if (password === undefined || password.length <= 0) { return; }
             await this.createTTRSSAccount(name, TTRSSApiURL(url), username, password);
         } else if (type === 'inoreader') {
             const custom = await vscode.window.showQuickPick(
                 ['no', 'yes'],
-                {placeHolder: "Using custom app ID & app key?"}
+                { placeHolder: "Using custom app ID & app key?" }
             );
             let appid, appkey;
             if (custom === 'yes') {
-                appid = await vscode.window.showInputBox({prompt: 'Enter app ID'});
-                if (!appid) {return;}
-                appkey = await vscode.window.showInputBox({prompt: 'Enter app key', password: true});
-                if (!appkey) {return;}
+                appid = await vscode.window.showInputBox({ prompt: 'Enter app ID' });
+                if (!appid) { return; }
+                appkey = await vscode.window.showInputBox({ prompt: 'Enter app key', password: true });
+                if (!appkey) { return; }
             } else {
                 appid = '999999367';
                 appkey = 'GOgPzs1RnPTok6q8kC8HgmUPji3DjspC';
@@ -631,7 +631,7 @@ export class App {
     }
 
     async rss_del_account(account: Account) {
-        const confirm = await vscode.window.showQuickPick(['no', 'yes'], {placeHolder: "Are you sure to delete?"});
+        const confirm = await vscode.window.showQuickPick(['no', 'yes'], { placeHolder: "Are you sure to delete?" });
         if (confirm !== 'yes') {
             return;
         }
@@ -639,8 +639,8 @@ export class App {
     }
 
     async rss_account_rename(account: Account) {
-        const name = await vscode.window.showInputBox({prompt: 'Enter the name'});
-        if (name === undefined || name.length <= 0) {return;}
+        const name = await vscode.window.showInputBox({ prompt: 'Enter the name' });
+        if (name === undefined || name.length <= 0) { return; }
         const accounts = App.cfg.get<any>('accounts');
         accounts[account.key].name = name;
         await App.cfg.update('accounts', accounts, true);
@@ -655,15 +655,15 @@ export class App {
                 prompt: 'Enter server URL(SELF_URL_PATH)',
                 value: cfg.server.substr(0, cfg.server.length - 4)
             });
-            if (url === undefined || url.length <= 0) {return;}
+            if (url === undefined || url.length <= 0) { return; }
             const username = await vscode.window.showInputBox({
                 prompt: 'Enter user name', value: cfg.username
             });
-            if (username === undefined || username.length <= 0) {return;}
+            if (username === undefined || username.length <= 0) { return; }
             const password = await vscode.window.showInputBox({
                 prompt: 'Enter password', password: true, value: cfg.password
             });
-            if (password === undefined || password.length <= 0) {return;}
+            if (password === undefined || password.length <= 0) { return; }
 
             cfg.server = TTRSSApiURL(url);
             cfg.username = username;
@@ -674,11 +674,11 @@ export class App {
             const appid = await vscode.window.showInputBox({
                 prompt: 'Enter app ID', value: cfg.appid
             });
-            if (!appid) {return;}
+            if (!appid) { return; }
             const appkey = await vscode.window.showInputBox({
                 prompt: 'Enter app key', password: true, value: cfg.appkey
             });
-            if (!appkey) {return;}
+            if (!appkey) { return; }
 
             cfg.appid = appid;
             cfg.appkey = appkey;
@@ -707,10 +707,10 @@ export class App {
         }
 
         const xml = `<?xml version="1.0" encoding="UTF-8"?>`
-                  + `<opml version="1.0">`
-                  + `<head><title>${collection.name}</title></head>`
-                  + `<body>${outlines.join('')}</body>`
-                  + `</opml>`;
+            + `<opml version="1.0">`
+            + `<head><title>${collection.name}</title></head>`
+            + `<body>${outlines.join('')}</body>`
+            + `</opml>`;
 
         await writeFile(path.fsPath, xml);
     }
@@ -718,7 +718,7 @@ export class App {
     async rss_import_from_opml(account: Account) {
         const collection = this.collections[account.key] as LocalCollection;
         assert(collection.type === 'local');
-        const paths = await vscode.window.showOpenDialog({canSelectMany: false});
+        const paths = await vscode.window.showOpenDialog({ canSelectMany: false });
         if (!paths) {
             return;
         }
@@ -727,7 +727,7 @@ export class App {
         await collection.addFeeds(parseOPML(xml));
     }
 
-    private async selectExpire(): Promise<number|undefined> {
+    private async selectExpire(): Promise<number | undefined> {
         const s = ['1 month', '2 months', '3 months', '6 months'];
         const t = [1 * 30, 2 * 30, 3 * 30, 6 * 30];
         const time = await vscode.window.showQuickPick(s, {

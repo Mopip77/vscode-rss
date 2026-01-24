@@ -1,4 +1,4 @@
-import * as parser from "fast-xml-parser";
+import { XMLParser } from "fast-xml-parser";
 import * as he from 'he';
 import * as cheerio from 'cheerio';
 import * as iconv from 'iconv-lite';
@@ -201,15 +201,15 @@ function parseEntry(dom: any, baseURL: string, exclude: Set<string>): Entry | un
 export function parseXML(xml: string, exclude: Set<string>): [Entry[], Summary] {
     const match = xml.match(/<\?xml.*encoding="(\S+)".*\?>/);
     xml = iconv.decode(Buffer.from(xml, 'binary'), match ? match[1]: 'utf-8');
-    const dom = parser.parse(xml, {
+    const parser = new XMLParser({
         attributeNamePrefix: "",
-        attrNodeName: "__attr",
+        attributesGroupName: "__attr",
         textNodeName: "__text",
-        cdataTagName: "__cdata",
-        cdataPositionChar: "",
+        cdataPropName: "__cdata",
         ignoreAttributes: false,
         parseAttributeValue: true,
     });
+    const dom = parser.parse(xml);
     let feed;
     if (dom.rss) {
         if (dom.rss.channel) {
