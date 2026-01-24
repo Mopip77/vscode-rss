@@ -8,16 +8,23 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Node
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v3
       with:
-        node-version: 14.x
+        node-version: 18.x
     - run: npm install
-    - run: npm install -g vsce
-    - name: Publish
-      run: vsce publish -p $VSCE_TOKEN
+    - run: npm install -g @vscode/vsce
+    - name: Package Extension
+      run: vsce package
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: '*.vsix'
+        generate_release_notes: true
       env:
-        VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
